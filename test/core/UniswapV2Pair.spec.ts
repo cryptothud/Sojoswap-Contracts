@@ -1,9 +1,8 @@
 import chai, { expect } from 'chai'
 import { BigNumber, Contract } from 'ethers'
-import { solidity, createFixtureLoader } from 'ethereum-waffle'
 import { expandTo18Decimals, mineBlock, encodePrice } from './shared/utilities'
 import { pairFixture } from './shared/fixtures'
-import { AddressZero, bigNumberify, myProvider } from '../reexports'
+import { AddressZero, bigNumberify, createFixtureLoader, myProvider, solidity } from '../reexports'
 
 const MINIMUM_LIQUIDITY = bigNumberify(10).pow(3)
 

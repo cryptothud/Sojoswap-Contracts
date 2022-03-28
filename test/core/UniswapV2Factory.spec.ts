@@ -1,10 +1,8 @@
 import chai, { expect } from 'chai'
 import { Contract } from 'ethers'
-import { solidity, MockProvider, createFixtureLoader } from 'ethereum-waffle'
-
 import { getCreate2Address } from './shared/utilities'
 import { factoryFixture } from './shared/fixtures'
-import { AddressZero, bigNumberify, myProvider, UniswapV2Pair } from '../reexports'
+import { AddressZero, bigNumberify, createFixtureLoader, myProvider, solidity, UniswapV2Pair } from '../reexports'
 
 chai.use(solidity)
 

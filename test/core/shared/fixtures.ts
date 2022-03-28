@@ -1,7 +1,6 @@
 import { Contract, ethers, Wallet } from 'ethers'
-import { deployContract } from 'ethereum-waffle'
 import { expandTo18Decimals } from './utilities'
-import { UniswapV2Factory, ERC20, UniswapV2Pair } from '../../reexports'
+import { UniswapV2Factory, ERC20, UniswapV2Pair, deployContract } from '../../reexports'
 
 interface FactoryFixture {
   factory: Contract

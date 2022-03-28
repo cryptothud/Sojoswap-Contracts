@@ -1,10 +1,9 @@
 import chai, { expect } from 'chai'
 import { Contract } from 'ethers'
-import { solidity,  deployContract } from 'ethereum-waffle'
 import { ecsign } from 'ethereumjs-util'
 
 import { expandTo18Decimals, getApprovalDigest } from './shared/utilities'
-import { bigNumberify, ERC20, MaxUint256, myProvider } from '../reexports'
+import { bigNumberify, deployContract, ERC20, MaxUint256, myProvider, solidity } from '../reexports'
 import { defaultAbiCoder, toUtf8Bytes, hexlify, keccak256 } from 'ethers/lib/utils'
 
 chai.use(solidity)

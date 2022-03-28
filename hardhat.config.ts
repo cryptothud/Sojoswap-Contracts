@@ -22,26 +22,33 @@ task("accounts", "Prints the list of accounts", async (taskArgs, hre) => {
 // You need to export an object to set up your config
 // Go to https://hardhat.org/config/ to learn more
 
+const generateCompilerConfig = (version: string) => {
+  return {
+    version,
+    settings: {
+      outputSelection: {
+        "*": {
+          "*": [
+            "*"
+          ],
+          "": ["ast"]
+        }
+      },
+      "evmVersion": "istanbul",
+      "optimizer": {
+        "enabled": true,
+        "runs": 999999
+      }
+    }
+  }
+}
+
 const config: HardhatUserConfig = {
   solidity: {
-    compilers: [{
-      version: "0.5.16",
-      settings: {
-        outputSelection: {
-          "*": {
-            "*": [
-              "*"
-            ],
-            "": ["ast"]
-          }
-        },
-        "evmVersion": "istanbul",
-        "optimizer": {
-          "enabled": true,
-          "runs": 999999
-        }
-      }
-    }]
+    compilers: [
+      generateCompilerConfig("0.6.12"),
+      generateCompilerConfig("0.5.16")
+    ]
   },
   networks: {
     ropsten: {
