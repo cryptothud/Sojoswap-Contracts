@@ -79,6 +79,7 @@ describe('UniswapV2Router02', () => {
       0,
       wallet.address,
       MaxUint256,
+      overrides
     )
     await expect(router.getAmountsOut(bigNumberify(2), [token0.address])).to.be.revertedWith(
       'UniswapV2Library: INVALID_PATH'
@@ -139,7 +140,7 @@ describe('fee-on-transfer tokens', () => {
   async function addLiquidity(DTTAmount: BigNumber, WETHAmount: BigNumber) {
     await DTT.approve(router.address, MaxUint256)
     await router.addLiquidityETH(DTT.address, DTTAmount, DTTAmount, WETHAmount, wallet.address, MaxUint256, {
-      ...{},
+      ...overrides,
       value: WETHAmount
     })
   }
@@ -304,7 +305,7 @@ describe('fee-on-transfer tokens: reloaded', () => {
     DTT2 = await deployContract(wallet, DeflatingERC20, [expandTo18Decimals(10000)])
 
     // make a DTT<>WETH pair
-    await fixture.factoryV2.createPair(DTT.address, DTT2.address)
+    await fixture.factoryV2.createPair(DTT.address, DTT2.address, overrides)
     const pairAddress = await fixture.factoryV2.getPair(DTT.address, DTT2.address)
   })
 
@@ -325,6 +326,7 @@ describe('fee-on-transfer tokens: reloaded', () => {
       DTT2Amount,
       wallet.address,
       MaxUint256,
+      overrides
     )
   }
 

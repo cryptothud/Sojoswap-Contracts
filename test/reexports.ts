@@ -1,6 +1,4 @@
 import { ethers as _ethers } from "hardhat";
-import { deployContract as _deployContract, solidity as _solidity, createFixtureLoader as _createFixtureLoader } from "ethereum-waffle";
-
 import _ERC20 from '../artifacts/contracts/core/test/ERC20.sol/ERC20.json'
 import _WETH9 from "../artifacts/contracts/periphery/test/WETH9.sol/WETH9.json"
 import _UniswapV2Factory from '../artifacts/contracts/core/UniswapV2Factory.sol/UniswapV2Factory.json'
