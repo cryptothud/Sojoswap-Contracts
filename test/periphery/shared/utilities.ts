@@ -1,14 +1,15 @@
-import { BigNumber, Contract } from 'ethers'
-import { keccak256, toUtf8Bytes, defaultAbiCoder, solidityPack, getAddress } from 'ethers/lib/utils'
+import { BigNumber, Contract, ethers } from 'ethers'
+import { defaultAbiCoder, keccak256, solidityPack, toUtf8Bytes } from 'ethers/lib/utils'
 import { bigNumberify } from '../../reexports'
-import {Web3Provider} from '@ethersproject/providers'
+
+export const MINIMUM_LIQUIDITY = bigNumberify(10).pow(3)
 
 const PERMIT_TYPEHASH = keccak256(
   toUtf8Bytes('Permit(address owner,address spender,uint256 value,uint256 nonce,uint256 deadline)')
 )
 
 export function expandTo18Decimals(n: number): BigNumber {
-  return bigNumberify(n).mul(bigNumberify(10).pow(18))
+  return bigNumberify(n).mul(ethers.constants.WeiPerEther)
 }
 
 function getDomainSeparator(name: string, tokenAddress: string) {
@@ -24,22 +25,6 @@ function getDomainSeparator(name: string, tokenAddress: string) {
       ]
     )
   )
-}
-
-export function getCreate2Address(
-  factoryAddress: string,
-  [tokenA, tokenB]: [string, string],
-  bytecode: string
-): string {
-  const [token0, token1] = tokenA < tokenB ? [tokenA, tokenB] : [tokenB, tokenA]
-  const create2Inputs = [
-    '0xff',
-    factoryAddress,
-    keccak256(solidityPack(['address', 'address'], [token0, token1])),
-    keccak256(bytecode)
-  ]
-  const sanitizedInputs = `0x${create2Inputs.map(i => i.slice(2)).join('')}`
-  return getAddress(`0x${keccak256(sanitizedInputs).slice(-40)}`)
 }
 
 export async function getApprovalDigest(
@@ -70,10 +55,6 @@ export async function getApprovalDigest(
       ]
     )
   )
-}
-
-export async function mineBlock(provider: Web3Provider, timestamp: number): Promise<void> {
-  await provider.send("evm_mine", [timestamp])
 }
 
 export function encodePrice(reserve0: BigNumber, reserve1: BigNumber) {

@@ -47,15 +47,14 @@ const config: HardhatUserConfig = {
   solidity: {
     compilers: [
       generateCompilerConfig("0.6.12"),
-      generateCompilerConfig("0.5.16")
+      generateCompilerConfig("0.5.16"),
+      generateCompilerConfig("0.6.6")
     ]
   },
   networks: {
-    ropsten: {
-      url: process.env.ROPSTEN_URL || "",
-      accounts:
-        process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
-    },
+    hardhat: {
+      blockGasLimit: 99999999,
+    }
   },
   gasReporter: {
     enabled: process.env.REPORT_GAS !== undefined,

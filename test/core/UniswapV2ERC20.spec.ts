@@ -6,10 +6,12 @@ import { expandTo18Decimals, getApprovalDigest } from './shared/utilities'
 import { bigNumberify, deployContract, ERC20, MaxUint256, myProvider, solidity } from '../reexports'
 import { defaultAbiCoder, toUtf8Bytes, hexlify, keccak256 } from 'ethers/lib/utils'
 
-chai.use(solidity)
-
 const TOTAL_SUPPLY = expandTo18Decimals(10000)
 const TEST_AMOUNT = expandTo18Decimals(10)
+
+const overrides = {
+  gasLimit: 9999999,
+}
 
 describe('UniswapV2ERC20', () => {
   const provider = myProvider
@@ -17,7 +19,7 @@ describe('UniswapV2ERC20', () => {
 
   let token: Contract
   beforeEach(async () => {
-    token = await deployContract(wallet, ERC20, [TOTAL_SUPPLY])
+    token = await deployContract(wallet, ERC20, [TOTAL_SUPPLY], overrides)
   })
 
   it('name, symbol, decimals, totalSupply, balanceOf, DOMAIN_SEPARATOR, PERMIT_TYPEHASH', async () => {
