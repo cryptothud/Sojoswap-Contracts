@@ -20,7 +20,7 @@ export async function v2Fixture([wallet]: Wallet[], provider: Web3Provider): Pro
   // deploy tokens
   const tokenA = await deployContract(wallet, ERC20, [expandTo18Decimals(10000)])
   const tokenB = await deployContract(wallet, ERC20, [expandTo18Decimals(10000)])
-  const WETH = await deployContract(wallet, WETH9, [])
+  const WETH = await deployContract(wallet, WETH9)
   const WETHPartner = await deployContract(wallet, ERC20, [expandTo18Decimals(10000)])
 
   // deploy V1 omitted
@@ -39,7 +39,7 @@ export async function v2Fixture([wallet]: Wallet[], provider: Web3Provider): Pro
   // initialize V2
   await factoryV2.createPair(tokenA.address, tokenB.address)
   const pairAddress = await factoryV2.getPair(tokenA.address, tokenB.address)
-  const pair = new ethers.Contract(pairAddress, JSON.stringify(IUniswapV2Pair.abi))
+  const pair = new ethers.Contract(pairAddress, JSON.stringify(IUniswapV2Pair.abi), provider).connect(wallet)
 
   const token0Address = await pair.token0()
   const token0 = tokenA.address === token0Address ? tokenA : tokenB
@@ -47,7 +47,7 @@ export async function v2Fixture([wallet]: Wallet[], provider: Web3Provider): Pro
 
   await factoryV2.createPair(WETH.address, WETHPartner.address)
   const WETHPairAddress = await factoryV2.getPair(WETH.address, WETHPartner.address)
-  const WETHPair = new ethers.Contract(WETHPairAddress, JSON.stringify(IUniswapV2Pair.abi))
+  const WETHPair = new ethers.Contract(WETHPairAddress, JSON.stringify(IUniswapV2Pair.abi), provider).connect(wallet)
 
   return {
     token0,
