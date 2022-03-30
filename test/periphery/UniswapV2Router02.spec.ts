@@ -261,7 +261,8 @@ describe("fee-on-transfer tokens", () => {
       false,
       v,
       r,
-      s
+      s,
+      overrides
     );
   });
 
