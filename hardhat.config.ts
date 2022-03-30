@@ -28,37 +28,35 @@ const generateCompilerConfig = (version: string) => {
     settings: {
       outputSelection: {
         "*": {
-          "*": [
-            "*"
-          ],
-          "": ["ast"]
-        }
+          "*": ["*"],
+          "": ["ast"],
+        },
       },
-      "evmVersion": "istanbul",
-      "optimizer": {
-        "enabled": true,
-        "runs": 999999
-      }
-    }
-  }
-}
+      evmVersion: "istanbul",
+      optimizer: {
+        enabled: true,
+        runs: 999999,
+      },
+    },
+  };
+};
 
 const config: HardhatUserConfig = {
   solidity: {
     compilers: [
       generateCompilerConfig("0.6.12"),
       generateCompilerConfig("0.5.16"),
-      generateCompilerConfig("0.6.6")
-    ]
+      generateCompilerConfig("0.6.6"),
+    ],
   },
   networks: {
     hardhat: {
       blockGasLimit: 99999999,
       accounts: {
-        mnemonic: "horn horn horn horn horn horn horn horn horn horn horn horn"
+        mnemonic: "horn horn horn horn horn horn horn horn horn horn horn horn",
       },
-      hardfork: "istanbul"
-    }
+      hardfork: "istanbul",
+    },
   },
   gasReporter: {
     enabled: process.env.REPORT_GAS !== undefined,

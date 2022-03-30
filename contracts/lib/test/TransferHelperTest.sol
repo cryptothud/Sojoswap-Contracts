@@ -2,7 +2,7 @@
 
 pragma solidity >=0.6.0;
 
-import '../libraries/TransferHelper.sol';
+import "../libraries/TransferHelper.sol";
 
 // test helper for transfers
 contract TransferHelperTest {
@@ -47,7 +47,7 @@ contract TransferHelperTestFakeERC20Compliant {
     }
 
     function transfer(address, uint256) external view returns (bool) {
-        require(!shouldRevert, 'REVERT');
+        require(!shouldRevert, "REVERT");
         return success;
     }
 
@@ -56,12 +56,12 @@ contract TransferHelperTestFakeERC20Compliant {
         address,
         uint256
     ) external view returns (bool) {
-        require(!shouldRevert, 'REVERT');
+        require(!shouldRevert, "REVERT");
         return success;
     }
 
     function approve(address, uint256) external view returns (bool) {
-        require(!shouldRevert, 'REVERT');
+        require(!shouldRevert, "REVERT");
         return success;
     }
 }

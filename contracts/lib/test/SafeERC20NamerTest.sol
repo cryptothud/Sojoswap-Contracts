@@ -2,7 +2,7 @@
 
 pragma solidity >=0.5.0;
 
-import '../libraries/SafeERC20Namer.sol';
+import "../libraries/SafeERC20Namer.sol";
 
 // used for testing the logic of token naming
 contract SafeERC20NamerTest {

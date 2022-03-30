@@ -2,7 +2,7 @@
 
 pragma solidity >=0.4.0;
 
-import '../libraries/Babylonian.sol';
+import "../libraries/Babylonian.sol";
 
 contract BabylonianEchidnaTest {
     function checkSqrt(uint256 input) public pure {

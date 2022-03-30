@@ -2,7 +2,7 @@
 
 pragma solidity >=0.4.0;
 
-import '../libraries/FullMath.sol';
+import "../libraries/FullMath.sol";
 
 contract FullMathEchidnaTest {
     function checkH(uint256 x, uint256 y) public pure {

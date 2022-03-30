@@ -2,7 +2,7 @@
 
 pragma solidity >=0.4.0;
 
-import '../libraries/FullMath.sol';
+import "../libraries/FullMath.sol";
 
 contract FullMathTest {
     function mulDiv(
