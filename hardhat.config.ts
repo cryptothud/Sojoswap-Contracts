@@ -54,6 +54,10 @@ const config: HardhatUserConfig = {
   networks: {
     hardhat: {
       blockGasLimit: 99999999,
+      accounts: {
+        mnemonic: "horn horn horn horn horn horn horn horn horn horn horn horn"
+      },
+      hardfork: "istanbul"
     }
   },
   gasReporter: {

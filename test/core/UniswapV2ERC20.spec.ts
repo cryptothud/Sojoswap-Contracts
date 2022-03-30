@@ -3,7 +3,7 @@ import { Contract } from 'ethers'
 import { ecsign } from 'ethereumjs-util'
 
 import { expandTo18Decimals, getApprovalDigest } from './shared/utilities'
-import { bigNumberify, deployContract, ERC20, MaxUint256, myProvider, solidity } from '../reexports'
+import { bigNumberify, deployContract, ERC20, MaxUint256, myChainId, myProvider, solidity } from '../reexports'
 import { defaultAbiCoder, toUtf8Bytes, hexlify, keccak256 } from 'ethers/lib/utils'
 
 const TOTAL_SUPPLY = expandTo18Decimals(10000)
@@ -39,7 +39,7 @@ describe('UniswapV2ERC20', () => {
             ),
             keccak256(toUtf8Bytes(name)),
             keccak256(toUtf8Bytes('1')),
-            1,
+            myChainId,
             token.address
           ]
         )

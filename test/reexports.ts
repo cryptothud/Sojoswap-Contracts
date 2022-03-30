@@ -12,20 +12,14 @@ import _IUniswapV2Pair from "../artifacts/contracts/core/interfaces/IUniswapV2Pa
 import _UniswapV2Router02 from "../artifacts/contracts/periphery/UniswapV2Router02.sol/UniswapV2Router02.json"
 import _RouterEventEmitter from "../artifacts/contracts/periphery/test/RouterEventEmitter.sol/RouterEventEmitter.json"
 
-import {waffle} from 'hardhat'
+import { waffle } from 'hardhat'
 export const ethers = _ethers
 export const bigNumberify = ethers.BigNumber.from
 export const ERC20 = _ERC20
 export const UniswapV2Factory = _UniswapV2Factory
 export const UniswapV2Pair = _UniswapV2Pair
 
-export const myProvider = new MockProvider({
-    ganacheOptions: {
-        hardfork: 'istanbul',
-        mnemonic: 'horn horn horn horn horn horn horn horn horn horn horn horn',
-        gasLimit: 9999999
-    }
-})
+export const myProvider = waffle.provider
 
 export const MaxUint256 = ethers.constants.MaxUint256
 export const AddressZero = ethers.constants.AddressZero
@@ -44,3 +38,5 @@ export const UniswapV2Router02 = _UniswapV2Router02
 export const WETH9 = _WETH9
 
 export const RouterEventEmitter = _RouterEventEmitter
+
+export const myChainId = 31337

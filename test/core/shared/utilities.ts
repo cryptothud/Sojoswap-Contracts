@@ -1,6 +1,6 @@
 import { BigNumber, Contract } from 'ethers'
 import { keccak256, toUtf8Bytes, defaultAbiCoder, solidityPack, getAddress } from 'ethers/lib/utils'
-import { bigNumberify } from '../../reexports'
+import { bigNumberify, myChainId } from '../../reexports'
 import {Web3Provider} from '@ethersproject/providers'
 
 const PERMIT_TYPEHASH = keccak256(
@@ -19,7 +19,7 @@ function getDomainSeparator(name: string, tokenAddress: string) {
         keccak256(toUtf8Bytes('EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)')),
         keccak256(toUtf8Bytes(name)),
         keccak256(toUtf8Bytes('1')),
-        1,
+        myChainId,
         tokenAddress
       ]
     )
