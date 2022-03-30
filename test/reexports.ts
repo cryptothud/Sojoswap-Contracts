@@ -1,4 +1,3 @@
-import { MockProvider } from "@ethereum-waffle/provider";
 import { ethers as _ethers } from "hardhat";
 import { deployContract as _deployContract, solidity as _solidity, createFixtureLoader as _createFixtureLoader } from "ethereum-waffle";
 

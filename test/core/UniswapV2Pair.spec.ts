@@ -192,6 +192,7 @@ describe('UniswapV2Pair', () => {
       .to.emit(pair, 'Burn')
       .withArgs(wallet.address, token0Amount.sub(1000), token1Amount.sub(1000), wallet.address)
 
+    
     expect(await pair.balanceOf(wallet.address)).to.eq(0)
     expect(await pair.totalSupply()).to.eq(MINIMUM_LIQUIDITY)
     expect(await token0.balanceOf(pair.address)).to.eq(1000)
@@ -214,7 +215,7 @@ describe('UniswapV2Pair', () => {
     const initialPrice = encodePrice(token0Amount, token1Amount)
     expect(await pair.price0CumulativeLast()).to.eq(initialPrice[0])
     expect(await pair.price1CumulativeLast()).to.eq(initialPrice[1])
-    expect((await pair.getReserves())[2]).to.eq(blockTimestamp + 1)
+    expect(await pair.getReserves().then((x:any) => x[2])).to.eq(blockTimestamp + 1)
 
     const swapAmount = expandTo18Decimals(3)
     await token0.transfer(pair.address, swapAmount)
@@ -224,7 +225,7 @@ describe('UniswapV2Pair', () => {
 
     expect(await pair.price0CumulativeLast()).to.eq(initialPrice[0].mul(10))
     expect(await pair.price1CumulativeLast()).to.eq(initialPrice[1].mul(10))
-    expect((await pair.getReserves())[2]).to.eq(blockTimestamp + 10)
+    expect(await pair.getReserves().then((x: any) => x[2])).to.eq(blockTimestamp + 10)
 
     await mineBlock(provider, blockTimestamp + 20)
     await pair.sync(overrides)
@@ -232,7 +233,7 @@ describe('UniswapV2Pair', () => {
     const newPrice = encodePrice(expandTo18Decimals(6), expandTo18Decimals(2))
     expect(await pair.price0CumulativeLast()).to.eq(initialPrice[0].mul(10).add(newPrice[0].mul(10)))
     expect(await pair.price1CumulativeLast()).to.eq(initialPrice[1].mul(10).add(newPrice[1].mul(10)))
-    expect((await pair.getReserves())[2]).to.eq(blockTimestamp + 20)
+    expect(await pair.getReserves().then((x:any) => x[2])).to.eq(blockTimestamp + 20)
   })
 
   it('feeTo:off', async () => {
