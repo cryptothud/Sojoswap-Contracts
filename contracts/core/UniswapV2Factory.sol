@@ -1,14 +1,14 @@
-pragma solidity =0.5.16;
+pragma solidity 0.6.6;
 
 import "./interfaces/IUniswapV2Factory.sol";
 import "./UniswapV2Pair.sol";
 
 contract UniswapV2Factory is IUniswapV2Factory {
-    address public feeTo;
-    address public feeToSetter;
+    address override public feeTo;
+    address override public feeToSetter;
 
-    mapping(address => mapping(address => address)) public getPair;
-    address[] public allPairs;
+    mapping(address => mapping(address => address)) override public getPair;
+    address[] override public allPairs;
 
     event PairCreated(
         address indexed token0,
@@ -21,11 +21,12 @@ contract UniswapV2Factory is IUniswapV2Factory {
         feeToSetter = _feeToSetter;
     }
 
-    function allPairsLength() external view returns (uint256) {
+    function allPairsLength() override external view returns (uint256) {
         return allPairs.length;
     }
 
     function createPair(address tokenA, address tokenB)
+        override
         external
         returns (address pair)
     {
@@ -50,12 +51,12 @@ contract UniswapV2Factory is IUniswapV2Factory {
         emit PairCreated(token0, token1, pair, allPairs.length);
     }
 
-    function setFeeTo(address _feeTo) external {
+    function setFeeTo(address _feeTo) override external {
         require(msg.sender == feeToSetter, "UniswapV2: FORBIDDEN");
         feeTo = _feeTo;
     }
 
-    function setFeeToSetter(address _feeToSetter) external {
+    function setFeeToSetter(address _feeToSetter) override external {
         require(msg.sender == feeToSetter, "UniswapV2: FORBIDDEN");
         feeToSetter = _feeToSetter;
     }

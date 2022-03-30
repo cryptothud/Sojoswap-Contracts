@@ -1,4 +1,4 @@
-pragma solidity =0.5.16;
+pragma solidity 0.6.6;
 
 import "./interfaces/IUniswapV2ERC20.sol";
 import "./libraries/SafeMath.sol";
@@ -6,18 +6,18 @@ import "./libraries/SafeMath.sol";
 contract UniswapV2ERC20 is IUniswapV2ERC20 {
     using SafeMath for uint256;
 
-    string public constant name = "Uniswap V2";
-    string public constant symbol = "UNI-V2";
-    uint8 public constant decimals = 18;
-    uint256 public totalSupply;
-    mapping(address => uint256) public balanceOf;
-    mapping(address => mapping(address => uint256)) public allowance;
+    string override public constant name = "Uniswap V2";
+    string override public constant symbol = "UNI-V2";
+    uint8 override public constant decimals = 18;
+    uint256 override public totalSupply;
+    mapping(address => uint256) override public balanceOf;
+    mapping(address => mapping(address => uint256)) override public allowance;
 
-    bytes32 public DOMAIN_SEPARATOR;
+    bytes32 override public DOMAIN_SEPARATOR;
     // keccak256("Permit(address owner,address spender,uint256 value,uint256 nonce,uint256 deadline)");
-    bytes32 public constant PERMIT_TYPEHASH =
+    bytes32 override public constant PERMIT_TYPEHASH =
         0x6e71edae12b1b97f4d1f60370fef10105fa2faae0126114a169c64845d6126c9;
-    mapping(address => uint256) public nonces;
+    mapping(address => uint256) override public nonces;
 
     event Approval(
         address indexed owner,
@@ -29,7 +29,7 @@ contract UniswapV2ERC20 is IUniswapV2ERC20 {
     constructor() public {
         uint256 chainId;
         assembly {
-            chainId := chainid
+            chainId := chainid()
         }
         DOMAIN_SEPARATOR = keccak256(
             abi.encode(
@@ -75,12 +75,12 @@ contract UniswapV2ERC20 is IUniswapV2ERC20 {
         emit Transfer(from, to, value);
     }
 
-    function approve(address spender, uint256 value) external returns (bool) {
+    function approve(address spender, uint256 value) override external returns (bool) {
         _approve(msg.sender, spender, value);
         return true;
     }
 
-    function transfer(address to, uint256 value) external returns (bool) {
+    function transfer(address to, uint256 value) override external returns (bool) {
         _transfer(msg.sender, to, value);
         return true;
     }
@@ -89,7 +89,7 @@ contract UniswapV2ERC20 is IUniswapV2ERC20 {
         address from,
         address to,
         uint256 value
-    ) external returns (bool) {
+    ) override external returns (bool) {
         if (allowance[from][msg.sender] != uint256(-1)) {
             allowance[from][msg.sender] = allowance[from][msg.sender].sub(
                 value
@@ -107,7 +107,7 @@ contract UniswapV2ERC20 is IUniswapV2ERC20 {
         uint8 v,
         bytes32 r,
         bytes32 s
-    ) external {
+    ) override external {
         require(deadline >= block.timestamp, "UniswapV2: EXPIRED");
         bytes32 digest = keccak256(
             abi.encodePacked(

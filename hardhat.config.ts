@@ -44,9 +44,7 @@ const generateCompilerConfig = (version: string) => {
 const config: HardhatUserConfig = {
   solidity: {
     compilers: [
-      generateCompilerConfig("0.6.12"),
-      generateCompilerConfig("0.5.16"),
-      generateCompilerConfig("0.6.6"),
+      generateCompilerConfig("0.6.6")
     ],
   },
   networks: {
