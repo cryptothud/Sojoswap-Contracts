@@ -301,32 +301,33 @@ describe("UniswapV2Pair", () => {
   it("price{0,1}CumulativeLast", async () => {
     const token0Amount = expandTo18Decimals(3);
     const token1Amount = expandTo18Decimals(3);
+
     await addLiquidity(token0Amount, token1Amount);
 
     const blockTimestamp = (await pair.getReserves())[2];
-    await mineBlock(provider, blockTimestamp + 1);
-    await pair.sync(overrides);
+    await pair.sync();
 
     const initialPrice = encodePrice(token0Amount, token1Amount);
-    expect(await pair.price0CumulativeLast()).to.eq(initialPrice[0]);
-    expect(await pair.price1CumulativeLast()).to.eq(initialPrice[1]);
     expect(await pair.getReserves().then((x: any) => x[2])).to.eq(
       blockTimestamp + 1
     );
+    expect(await pair.price0CumulativeLast()).to.eq(initialPrice[0]);
+    expect(await pair.price1CumulativeLast()).to.eq(initialPrice[1]);
 
     const swapAmount = expandTo18Decimals(3);
     await token0.transfer(pair.address, swapAmount);
-    await mineBlock(provider, blockTimestamp + 10);
     // swap to a new price eagerly instead of syncing
+    await mineBlock(provider, blockTimestamp + 9); //9 seconds after that timestamp plus the "1 second" that 
+                                                   //ganache uses to enforce the next tx goes in in the next block time slot
     await pair.swap(0, expandTo18Decimals(1), wallet.address, "0x", overrides); // make the price nice
-
-    expect(await pair.price0CumulativeLast()).to.eq(initialPrice[0].mul(10));
-    expect(await pair.price1CumulativeLast()).to.eq(initialPrice[1].mul(10));
+    //note: ganache by default enforces provider.getBlock(x).timestamp strictly < provider.getBlock(x+1).timestamp
     expect(await pair.getReserves().then((x: any) => x[2])).to.eq(
       blockTimestamp + 10
     );
+    expect(await pair.price0CumulativeLast()).to.eq(initialPrice[0].mul(10));
+    expect(await pair.price1CumulativeLast()).to.eq(initialPrice[1].mul(10));
 
-    await mineBlock(provider, blockTimestamp + 20);
+    await mineBlock(provider, blockTimestamp + 19); //19 seconds + 1 second (see note above) = 20 seconds
     await pair.sync(overrides);
 
     const newPrice = encodePrice(expandTo18Decimals(6), expandTo18Decimals(2));
@@ -357,33 +358,4 @@ describe("UniswapV2Pair", () => {
     expect(await pair.totalSupply()).to.eq(MINIMUM_LIQUIDITY);
   });
 
-  it("feeTo:on", async () => {
-    await factory.setFeeTo(other.address);
-
-    const token0Amount = expandTo18Decimals(1000);
-    const token1Amount = expandTo18Decimals(1000);
-    await addLiquidity(token0Amount, token1Amount);
-
-    const swapAmount = expandTo18Decimals(1);
-    const expectedOutputAmount = bigNumberify("996006981039903216");
-    await token1.transfer(pair.address, swapAmount);
-    await pair.swap(expectedOutputAmount, 0, wallet.address, "0x", overrides);
-
-    const expectedLiquidity = expandTo18Decimals(1000);
-    await pair.transfer(pair.address, expectedLiquidity.sub(MINIMUM_LIQUIDITY));
-    await pair.burn(wallet.address, overrides);
-    expect(await pair.totalSupply()).to.eq(
-      MINIMUM_LIQUIDITY.add("249750499251388")
-    );
-    expect(await pair.balanceOf(other.address)).to.eq("249750499251388");
-
-    // using 1000 here instead of the symbolic MINIMUM_LIQUIDITY because the amounts only happen to be equal...
-    // ...because the initial liquidity amounts were equal
-    expect(await token0.balanceOf(pair.address)).to.eq(
-      bigNumberify(1000).add("249501683697445")
-    );
-    expect(await token1.balanceOf(pair.address)).to.eq(
-      bigNumberify(1000).add("250000187312969")
-    );
-  });
-});
+})

@@ -1,11 +1,12 @@
 import * as dotenv from "dotenv";
 
-import { HardhatUserConfig, task } from "hardhat/config";
+import { HardhatUserConfig, task} from "hardhat/config";
 import "@nomiclabs/hardhat-etherscan";
 import "@nomiclabs/hardhat-waffle";
 import "@typechain/hardhat";
 import "hardhat-gas-reporter";
 import "solidity-coverage";
+import { fstatSync, write, writeFileSync } from "fs";
 
 dotenv.config();
 
@@ -18,6 +19,15 @@ task("accounts", "Prints the list of accounts", async (taskArgs, hre) => {
     console.log(account.address);
   }
 });
+
+
+task("generateInitCode", "", async (taskArgs, hre) => {
+  const factory = await hre.ethers.getContractFactory("GenerateInitCodeHash")
+  const contract = await factory.deploy()
+  const hash = await contract.getInitHash()
+
+  console.log("pair hash: ", hash)
+})
 
 // You need to export an object to set up your config
 // Go to https://hardhat.org/config/ to learn more

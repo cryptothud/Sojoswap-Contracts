@@ -1,8 +1,8 @@
 {
   "name": "hardhat-project",
   "scripts": {
-    "build": "hardhat compile",
-    "test": "hardhat compile && hardhat test",
+    "build": "hardhat generateInitCode && hardhat compile",
+    "test": "hardhat test",
     "format": "prettier --write {,*/**/}*.{sol,ts}"
   },
   "dependencies": {
