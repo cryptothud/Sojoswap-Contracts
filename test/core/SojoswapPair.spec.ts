@@ -18,7 +18,7 @@ const overrides = {
   gasLimit: 9999999,
 };
 
-describe("UniswapV2Pair", () => {
+describe("SojoswapPair", () => {
   const provider = myProvider;
   const [wallet, other] = provider.getWallets();
   const loadFixture = createFixtureLoader([wallet], provider);
@@ -104,7 +104,7 @@ describe("UniswapV2Pair", () => {
           "0x",
           overrides
         )
-      ).to.be.revertedWith("UniswapV2: K");
+      ).to.be.revertedWith("Sojoswap: K");
       await pair.swap(0, expectedOutputAmount, wallet.address, "0x", overrides);
     });
   });
@@ -127,7 +127,7 @@ describe("UniswapV2Pair", () => {
       await token0.transfer(pair.address, inputAmount);
       await expect(
         pair.swap(outputAmount.add(1), 0, wallet.address, "0x", overrides)
-      ).to.be.revertedWith("UniswapV2: K");
+      ).to.be.revertedWith("Sojoswap: K");
       await pair.swap(outputAmount, 0, wallet.address, "0x", overrides);
     });
   });

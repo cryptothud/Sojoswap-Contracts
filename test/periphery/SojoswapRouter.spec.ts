@@ -1,5 +1,5 @@
 import chai, { expect } from "chai";
-import { BigNumber, Contract } from "ethers";
+import { BigNumber, BigNumberish, Contract, ethers } from "ethers";
 import { v2Fixture } from "./shared/fixtures";
 import {
   expandTo18Decimals,
@@ -13,7 +13,7 @@ import {
   bigNumberify,
   createFixtureLoader,
   deployContract,
-  IUniswapV2Pair,
+  ISojoswapPair,
   MaxUint256,
   myProvider,
 } from "../reexports";
@@ -22,7 +22,7 @@ const overrides = {
   gasLimit: 99_999_999,
 };
 
-describe("UniswapV2Router02", () => {
+describe("SojoswapRouter", () => {
   const provider = myProvider;
   const [wallet] = provider.getWallets();
   const loadFixture = createFixtureLoader([wallet], provider);
@@ -37,7 +37,7 @@ describe("UniswapV2Router02", () => {
     router = fixture.router02;
   });
 
-  it("quote", async () => {
+  it("pyable", async () => {
     expect(
       await router.quote(bigNumberify(1), bigNumberify(100), bigNumberify(200))
     ).to.eq(bigNumberify(2));
@@ -46,13 +46,13 @@ describe("UniswapV2Router02", () => {
     ).to.eq(bigNumberify(1));
     await expect(
       router.quote(bigNumberify(0), bigNumberify(100), bigNumberify(200))
-    ).to.be.revertedWith("UniswapV2Library: INSUFFICIENT_AMOUNT");
+    ).to.be.revertedWith("SojoswapLibrary: INSUFFICIENT_AMOUNT");
     await expect(
       router.quote(bigNumberify(1), bigNumberify(0), bigNumberify(200))
-    ).to.be.revertedWith("UniswapV2Library: INSUFFICIENT_LIQUIDITY");
+    ).to.be.revertedWith("SojoswapLibrary: INSUFFICIENT_LIQUIDITY");
     await expect(
       router.quote(bigNumberify(1), bigNumberify(100), bigNumberify(0))
-    ).to.be.revertedWith("UniswapV2Library: INSUFFICIENT_LIQUIDITY");
+    ).to.be.revertedWith("SojoswapLibrary: INSUFFICIENT_LIQUIDITY");
   });
 
   it("getAmountOut", async () => {
@@ -65,13 +65,13 @@ describe("UniswapV2Router02", () => {
     ).to.eq(bigNumberify(1));
     await expect(
       router.getAmountOut(bigNumberify(0), bigNumberify(100), bigNumberify(100))
-    ).to.be.revertedWith("UniswapV2Library: INSUFFICIENT_INPUT_AMOUNT");
+    ).to.be.revertedWith("SojoswapLibrary: INSUFFICIENT_INPUT_AMOUNT");
     await expect(
       router.getAmountOut(bigNumberify(2), bigNumberify(0), bigNumberify(100))
-    ).to.be.revertedWith("UniswapV2Library: INSUFFICIENT_LIQUIDITY");
+    ).to.be.revertedWith("SojoswapLibrary: INSUFFICIENT_LIQUIDITY");
     await expect(
       router.getAmountOut(bigNumberify(2), bigNumberify(100), bigNumberify(0))
-    ).to.be.revertedWith("UniswapV2Library: INSUFFICIENT_LIQUIDITY");
+    ).to.be.revertedWith("SojoswapLibrary: INSUFFICIENT_LIQUIDITY");
   });
 
   it("getAmountIn", async () => {
@@ -84,17 +84,16 @@ describe("UniswapV2Router02", () => {
     ).to.eq(bigNumberify(2));
     await expect(
       router.getAmountIn(bigNumberify(0), bigNumberify(100), bigNumberify(100))
-    ).to.be.revertedWith("UniswapV2Library: INSUFFICIENT_OUTPUT_AMOUNT");
+    ).to.be.revertedWith("SojoswapLibrary: INSUFFICIENT_OUTPUT_AMOUNT");
     await expect(
       router.getAmountIn(bigNumberify(1), bigNumberify(0), bigNumberify(100))
-    ).to.be.revertedWith("UniswapV2Library: INSUFFICIENT_LIQUIDITY");
+    ).to.be.revertedWith("SojoswapLibrary: INSUFFICIENT_LIQUIDITY");
     await expect(
       router.getAmountIn(bigNumberify(1), bigNumberify(100), bigNumberify(0))
-    ).to.be.revertedWith("UniswapV2Library: INSUFFICIENT_LIQUIDITY");
+    ).to.be.revertedWith("SojoswapLibrary: INSUFFICIENT_LIQUIDITY");
   });
 
   it("getAmountsOut", async () => {
-    console.log(await token0.balanceOf(wallet.address));
     await token0.approve(router.address, MaxUint256);
     await token1.approve(router.address, MaxUint256);
     await router.addLiquidity(
@@ -110,7 +109,7 @@ describe("UniswapV2Router02", () => {
     );
     await expect(
       router.getAmountsOut(bigNumberify(2), [token0.address])
-    ).to.be.revertedWith("UniswapV2Library: INVALID_PATH");
+    ).to.be.revertedWith("SojoswapLibrary: INVALID_PATH");
     const path = [token0.address, token1.address];
     expect(await router.getAmountsOut(bigNumberify(2), path)).to.deep.eq([
       bigNumberify(2),
@@ -135,7 +134,7 @@ describe("UniswapV2Router02", () => {
 
     await expect(
       router.getAmountsIn(bigNumberify(1), [token0.address])
-    ).to.be.revertedWith("UniswapV2Library: INVALID_PATH");
+    ).to.be.revertedWith("SojoswapLibrary: INVALID_PATH");
     const path = [token0.address, token1.address];
     expect(await router.getAmountsIn(bigNumberify(1), path)).to.deep.eq([
       bigNumberify(2),
@@ -170,13 +169,14 @@ describe("fee-on-transfer tokens", () => {
     );
     pair = new Contract(
       pairAddress,
-      JSON.stringify(IUniswapV2Pair.abi),
+      JSON.stringify(ISojoswapPair.abi),
       provider
     ).connect(wallet);
   });
 
   afterEach(async function () {
     expect(await provider.getBalance(router.address)).to.eq(0);
+    expect(await WETH.balanceOf(router.address)).to.eq(0);
   });
 
   async function addLiquidity(DTTAmount: BigNumber, WETHAmount: BigNumber) {
@@ -413,3 +413,88 @@ describe("fee-on-transfer tokens: reloaded", () => {
     });
   });
 });
+
+describe("taxes", () => {
+  let router:Contract;
+  let WETH:Contract;
+  let WETHPartner:Contract;
+  const amt = ethers.utils.parseEther("1.0");
+  const provider = myProvider;
+  const [wallet] = provider.getWallets();
+  const loadFixture = createFixtureLoader([wallet], provider);
+  let expectedTax: BigNumber;
+  let ethIn:[string,string];
+  let ethOut:[string,string];
+  let feeTo: string;
+  let expectedTaxFunction: (arg0: BigNumberish) => BigNumber
+
+  let runSwapExpectEth = async (fn: (amountTokens:BigNumber, amountEth:BigNumber)=>Promise<void>) => {
+    let amountTokens:BigNumber = (await router.getAmountsIn(amt, ethOut))[0]
+    await fn(amountTokens, amt)
+    const actual = await provider.getBalance(feeTo)
+    const expected = expectedTaxFunction(amt)
+    const bigger = actual.gte(expected) ? actual : expected
+    const smaller = actual.gte(expected) ? expected : actual
+    const diff = bigger.sub(smaller)
+    const delta = ethers.utils.parseEther("0.00001")
+    expect(diff.lte(delta), `Actual: ${actual.toString()}; Expected: ${expected.toString()}; Difference: ${ethers.utils.formatEther(diff.toString())}; Difference above delta threshold (${ethers.utils.formatEther(delta)} ETH)`).to.be.true
+    expect(await provider.getBalance(router.address)).to.equal(0)
+  }
+  let runSwapExpectTokens = async (fn: (amountEth:BigNumber, amountTokens:BigNumber)=>Promise<void>) => {
+    let amountEth:BigNumber = (await router.getAmountsIn(100, ethIn))[0]
+    await fn(BigNumber.from(100), amountEth)
+    const actual = await provider.getBalance(feeTo)
+    const expected = expectedTaxFunction(amountEth)
+    const bigger = actual.gte(expected) ? actual : expected
+    const smaller = actual.gte(expected) ? expected : actual
+    const diff = bigger.sub(smaller)
+    const delta = ethers.utils.parseEther("0.00001")
+    expect(diff.lte(delta), `Actual: ${actual.toString()}; Expected: ${expected.toString()}; Difference: ${ethers.utils.formatEther(diff.toString())}; Difference above delta threshold (${ethers.utils.formatEther(delta)} ETH)`).to.be.true
+    expect(await provider.getBalance(router.address)).to.equal(0)
+  }
+
+  beforeEach(async () => {
+    const fixture = await loadFixture(v2Fixture);
+    router = fixture.router02;
+    WETH = fixture.WETH;
+    WETHPartner = fixture.WETHPartner;
+    expectedTax = fixture.calculateReceivedTaxes(amt);
+    await WETH.deposit({value: amt.mul(10)})
+    await WETH.approve(router.address, MaxUint256)
+    await WETHPartner.approve(router.address, MaxUint256)
+    await router.addLiquidity(
+      WETH.address,
+      WETHPartner.address,
+      amt.mul(5),
+      10000,
+      0,
+      0,
+      wallet.address,
+      MaxUint256,
+      overrides
+    );
+    ethIn = [WETH.address, WETHPartner.address]
+    ethOut = [WETHPartner.address, WETH.address]
+    feeTo = fixture.feeToAddress;
+    expectedTaxFunction = fixture.calculateReceivedTaxes
+  })
+
+  it('swapExactETHForTokens', async () => {
+    await runSwapExpectTokens((_, amount) => router.swapExactETHForTokens(0, ethIn, wallet.address, MaxUint256, {value: amount}))
+  })
+
+  it('swapExactETHForTokensSupportingFeeOnTransferTokens', async () => {
+    await runSwapExpectTokens((_, amount) => router.swapExactETHForTokensSupportingFeeOnTransferTokens(0, ethIn, wallet.address, MaxUint256, {value: amount}))
+  })
+
+  it('swapTokensForExactETH', async () => {
+    await runSwapExpectEth((_, amountIn) => router.swapTokensForExactETH(amountIn, MaxUint256, ethOut, wallet.address, MaxUint256))
+  })
+
+  it('swapExactTokensForETHSupportingFeeOnTransferTokens', async () => {
+    await runSwapExpectEth((amountIn) => router.swapExactTokensForETHSupportingFeeOnTransferTokens(amountIn, 0, ethOut, wallet.address, MaxUint256))
+  })
+  it('swapETHForExactTokens', async () => {
+    await runSwapExpectTokens((amountOut, amount) => router.swapETHForExactTokens(amountOut, ethIn, wallet.address, MaxUint256,{value: amount.add(expectedTaxFunction(amount)), gasLimit: 30_000_000}))
+  })
+})

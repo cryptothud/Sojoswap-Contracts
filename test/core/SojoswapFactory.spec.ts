@@ -8,7 +8,7 @@ import {
   createFixtureLoader,
   myProvider,
   solidity,
-  UniswapV2Pair,
+  SojoswapPair,
 } from "../reexports";
 
 chai.use(solidity);
@@ -18,7 +18,7 @@ const TEST_ADDRESSES: [string, string] = [
   "0x2000000000000000000000000000000000000000",
 ];
 
-describe("UniswapV2Factory", () => {
+describe("SojoswapFactory", () => {
   const provider = myProvider;
   const [wallet, other] = provider.getWallets();
   const loadFixture = createFixtureLoader([wallet, other], provider);
@@ -36,7 +36,7 @@ describe("UniswapV2Factory", () => {
   });
 
   async function createPair(tokens: [string, string]) {
-    const bytecode = `${UniswapV2Pair.bytecode}`;
+    const bytecode = `${SojoswapPair.bytecode}`;
     const create2Address = getCreate2Address(factory.address, tokens, bytecode);
     await expect(factory.createPair(...tokens))
       .to.emit(factory, "PairCreated")
@@ -47,9 +47,9 @@ describe("UniswapV2Factory", () => {
         bigNumberify(1)
       );
 
-    await expect(factory.createPair(...tokens)).to.be.reverted; // UniswapV2: PAIR_EXISTS
+    await expect(factory.createPair(...tokens)).to.be.reverted; // Sojoswap: PAIR_EXISTS
     await expect(factory.createPair(...tokens.slice().reverse())).to.be
-      .reverted; // UniswapV2: PAIR_EXISTS
+      .reverted; // Sojoswap: PAIR_EXISTS
     expect(await factory.getPair(...tokens)).to.eq(create2Address);
     expect(await factory.getPair(...tokens.slice().reverse())).to.eq(
       create2Address
@@ -59,7 +59,7 @@ describe("UniswapV2Factory", () => {
 
     const pair = new Contract(
       create2Address,
-      JSON.stringify(UniswapV2Pair.abi),
+      JSON.stringify(SojoswapPair.abi),
       provider
     );
     expect(await pair.factory()).to.eq(factory.address);
@@ -79,13 +79,13 @@ describe("UniswapV2Factory", () => {
     //TODO: this test should fail for now to compare gas costs
     const tx = await factory.createPair(...TEST_ADDRESSES);
     const receipt = await tx.wait();
-    expect(receipt.gasUsed).to.eq(2512920);
+    expect(receipt.gasUsed).to.eq(2398353);
   });
 
   it("setFeeTo", async () => {
     await expect(
       factory.connect(other).setFeeTo(other.address)
-    ).to.be.revertedWith("UniswapV2: FORBIDDEN");
+    ).to.be.revertedWith("Sojoswap: FORBIDDEN");
     await factory.setFeeTo(wallet.address);
     expect(await factory.feeTo()).to.eq(wallet.address);
   });
@@ -93,11 +93,11 @@ describe("UniswapV2Factory", () => {
   it("setFeeToSetter", async () => {
     await expect(
       factory.connect(other).setFeeToSetter(other.address)
-    ).to.be.revertedWith("UniswapV2: FORBIDDEN");
+    ).to.be.revertedWith("Sojoswap: FORBIDDEN");
     await factory.setFeeToSetter(other.address);
     expect(await factory.feeToSetter()).to.eq(other.address);
     await expect(factory.setFeeToSetter(wallet.address)).to.be.revertedWith(
-      "UniswapV2: FORBIDDEN"
+      "Sojoswap: FORBIDDEN"
     );
   });
 });

@@ -1,9 +1,9 @@
 pragma solidity 0.6.6;
 
-import "./interfaces/IUniswapV2ERC20.sol";
+import "./interfaces/ISojoswapERC20.sol";
 import "./libraries/SafeMath.sol";
 
-contract UniswapV2ERC20 is IUniswapV2ERC20 {
+contract SojoswapERC20 is ISojoswapERC20 {
     using SafeMath for uint256;
 
     string override public constant name = "Uniswap V2";
@@ -108,7 +108,7 @@ contract UniswapV2ERC20 is IUniswapV2ERC20 {
         bytes32 r,
         bytes32 s
     ) override external {
-        require(deadline >= block.timestamp, "UniswapV2: EXPIRED");
+        require(deadline >= block.timestamp, "Sojoswap: EXPIRED");
         bytes32 digest = keccak256(
             abi.encodePacked(
                 "\x19\x01",
@@ -128,7 +128,7 @@ contract UniswapV2ERC20 is IUniswapV2ERC20 {
         address recoveredAddress = ecrecover(digest, v, r, s);
         require(
             recoveredAddress != address(0) && recoveredAddress == owner,
-            "UniswapV2: INVALID_SIGNATURE"
+            "Sojoswap: INVALID_SIGNATURE"
         );
         _approve(owner, spender, value);
     }

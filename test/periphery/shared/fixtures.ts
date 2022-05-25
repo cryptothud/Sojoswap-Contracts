@@ -1,13 +1,13 @@
-import { Wallet, Contract } from "ethers";
+import { Wallet, Contract, BigNumberish, BigNumber } from "ethers";
 import { expandTo18Decimals } from "./utilities";
 import { Web3Provider } from "@ethersproject/providers";
 import {
   deployContract,
   ERC20,
-  IUniswapV2Pair,
+  ISojoswapPair,
   RouterEventEmitter,
-  UniswapV2Factory,
-  UniswapV2Router02,
+  SojoswapFactory,
+  SojoswapRouter,
   WETH9,
 } from "../../reexports";
 import { ethers } from "hardhat";
@@ -22,6 +22,8 @@ interface V2Fixture {
   router: Contract;
   pair: Contract;
   WETHPair: Contract;
+  feeToAddress: string;
+  calculateReceivedTaxes: (arg0: BigNumberish) => BigNumber;
 }
 
 export async function v2Fixture(
@@ -29,6 +31,7 @@ export async function v2Fixture(
   provider: Web3Provider
 ): Promise<V2Fixture> {
   // deploy tokens
+  const feeToAddress = "0xb057d8EFc5B908aFFEbE75934D4722AEbF2D4cf0"
   const tokenA = await deployContract(wallet, ERC20, [
     expandTo18Decimals(10000),
   ]);
@@ -43,15 +46,21 @@ export async function v2Fixture(
   // deploy V1 omitted
 
   // deploy V2
-  const factoryV2 = await deployContract(wallet, UniswapV2Factory, [
+  const factoryV2 = await deployContract(wallet, SojoswapFactory, [
     wallet.address,
   ]);
 
   // deploy routers
-  const router02 = await deployContract(wallet, UniswapV2Router02, [
+  const router02 = await deployContract(wallet, SojoswapRouter, [
     factoryV2.address,
     WETH.address,
   ]);
+
+  await factoryV2.setFeeTo(feeToAddress)
+  await router02.connect(wallet).setTax(1000);
+  const calculateReceivedTaxes = (arg0: BigNumberish) => {
+    return BigNumber.from(arg0).mul(1000).div(100000);
+  }
 
   // event emitter for testing
   const routerEventEmitter = await deployContract(
@@ -67,9 +76,11 @@ export async function v2Fixture(
   const pairAddress = await factoryV2.getPair(tokenA.address, tokenB.address);
   const pair = new ethers.Contract(
     pairAddress,
-    JSON.stringify(IUniswapV2Pair.abi),
+    JSON.stringify(ISojoswapPair.abi),
     provider
   ).connect(wallet);
+
+
 
   const token0Address = await pair.token0();
   const token0 = tokenA.address === token0Address ? tokenA : tokenB;
@@ -82,7 +93,7 @@ export async function v2Fixture(
   );
   const WETHPair = new ethers.Contract(
     WETHPairAddress,
-    JSON.stringify(IUniswapV2Pair.abi),
+    JSON.stringify(ISojoswapPair.abi),
     provider
   ).connect(wallet);
 
@@ -97,5 +108,7 @@ export async function v2Fixture(
     routerEventEmitter,
     pair,
     WETHPair,
+    feeToAddress,
+    calculateReceivedTaxes
   };
 }

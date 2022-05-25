@@ -6,7 +6,6 @@ import "@nomiclabs/hardhat-waffle";
 import "@typechain/hardhat";
 import "hardhat-gas-reporter";
 import "solidity-coverage";
-import { fstatSync, write, writeFileSync } from "fs";
 
 dotenv.config();
 
@@ -42,7 +41,6 @@ const generateCompilerConfig = (version: string) => {
           "": ["ast"],
         },
       },
-      evmVersion: "istanbul",
       optimizer: {
         enabled: true,
         runs: 999999,

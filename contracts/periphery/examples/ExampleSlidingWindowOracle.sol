@@ -1,12 +1,12 @@
 pragma solidity =0.6.6;
 
-import "../../core/interfaces/IUniswapV2Factory.sol";
-import "../../core/interfaces/IUniswapV2Pair.sol";
+import "../../core/interfaces/ISojoswapFactory.sol";
+import "../../core/interfaces/ISojoswapPair.sol";
 import "../../lib/libraries/FixedPoint.sol";
 
 import "../libraries/SafeMath.sol";
-import "../libraries/UniswapV2Library.sol";
-import "../libraries/UniswapV2OracleLibrary.sol";
+import "../libraries/SojoswapLibrary.sol";
+import "../libraries/SojoswapOracleLibrary.sol";
 
 // sliding window oracle that uses observations collected over a window to provide moving price averages in the past
 // `windowSize` with a precision of `windowSize / granularity`
@@ -80,7 +80,7 @@ contract ExampleSlidingWindowOracle {
     // update the cumulative price for the observation at the current timestamp. each observation is updated at most
     // once per epoch period.
     function update(address tokenA, address tokenB) external {
-        address pair = UniswapV2Library.pairFor(factory, tokenA, tokenB);
+        address pair = SojoswapLibrary.pairFor(factory, tokenA, tokenB);
 
         // populate the array with empty observations (first call only)
         for (uint256 i = pairObservations[pair].length; i < granularity; i++) {
@@ -100,7 +100,7 @@ contract ExampleSlidingWindowOracle {
                 uint256 price0Cumulative,
                 uint256 price1Cumulative,
 
-            ) = UniswapV2OracleLibrary.currentCumulativePrices(pair);
+            ) = SojoswapOracleLibrary.currentCumulativePrices(pair);
             observation.timestamp = block.timestamp;
             observation.price0Cumulative = price0Cumulative;
             observation.price1Cumulative = price1Cumulative;
@@ -130,7 +130,7 @@ contract ExampleSlidingWindowOracle {
         uint256 amountIn,
         address tokenOut
     ) external view returns (uint256 amountOut) {
-        address pair = UniswapV2Library.pairFor(factory, tokenIn, tokenOut);
+        address pair = SojoswapLibrary.pairFor(factory, tokenIn, tokenOut);
         Observation storage firstObservation = getFirstObservationInWindow(
             pair
         );
@@ -150,8 +150,8 @@ contract ExampleSlidingWindowOracle {
             uint256 price0Cumulative,
             uint256 price1Cumulative,
 
-        ) = UniswapV2OracleLibrary.currentCumulativePrices(pair);
-        (address token0, ) = UniswapV2Library.sortTokens(tokenIn, tokenOut);
+        ) = SojoswapOracleLibrary.currentCumulativePrices(pair);
+        (address token0, ) = SojoswapLibrary.sortTokens(tokenIn, tokenOut);
 
         if (token0 == tokenIn) {
             return

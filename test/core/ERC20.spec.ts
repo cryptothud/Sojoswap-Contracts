@@ -26,7 +26,7 @@ const overrides = {
   gasLimit: 9999999,
 };
 
-describe("UniswapV2ERC20", () => {
+describe("SojoswapERC20", () => {
   const provider = myProvider;
   const [wallet, other] = provider.getWallets();
 

@@ -1,9 +1,9 @@
 import { Contract, Wallet } from "ethers";
 import { expandTo18Decimals } from "./utilities";
 import {
-  UniswapV2Factory,
+  SojoswapFactory,
   ERC20,
-  UniswapV2Pair,
+  SojoswapPair,
   deployContract,
 } from "../../reexports";
 import { Web3Provider } from "@ethersproject/providers";
@@ -21,7 +21,7 @@ export async function factoryFixture(
 ): Promise<FactoryFixture> {
   const factory = await deployContract(
     wallet,
-    UniswapV2Factory,
+    SojoswapFactory,
     [wallet.address],
     overrides
   );
@@ -57,7 +57,7 @@ export async function pairFixture(
   const pairAddress = await factory.getPair(tokenA.address, tokenB.address);
   const pair = new Contract(
     pairAddress,
-    JSON.stringify(UniswapV2Pair.abi),
+    JSON.stringify(SojoswapPair.abi),
     provider
   ).connect(wallet);
 

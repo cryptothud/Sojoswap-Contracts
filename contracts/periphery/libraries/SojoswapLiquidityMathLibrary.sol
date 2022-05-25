@@ -1,16 +1,16 @@
 pragma solidity >=0.5.0;
 
-import "../../core/interfaces/IUniswapV2Pair.sol";
-import "../../core/interfaces/IUniswapV2Factory.sol";
+import "../../core/interfaces/ISojoswapPair.sol";
+import "../../core/interfaces/ISojoswapFactory.sol";
 import "../../lib/libraries/Babylonian.sol";
 import "../../lib/libraries/FullMath.sol";
 
 import "./SafeMath.sol";
-import "./UniswapV2Library.sol";
+import "./SojoswapLibrary.sol";
 
 // library containing some math for dealing with the liquidity shares of a pair, e.g. computing their exact value
 // in terms of the underlying tokens
-library UniswapV2LiquidityMathLibrary {
+library SojoswapLiquidityMathLibrary {
     using SafeMath for uint256;
 
     // computes the direction and magnitude of the profit-maximizing trade
@@ -51,7 +51,7 @@ library UniswapV2LiquidityMathLibrary {
         uint256 truePriceTokenB
     ) internal view returns (uint256 reserveA, uint256 reserveB) {
         // first get reserves before the swap
-        (reserveA, reserveB) = UniswapV2Library.getReserves(
+        (reserveA, reserveB) = SojoswapLibrary.getReserves(
             factory,
             tokenA,
             tokenB
@@ -59,7 +59,7 @@ library UniswapV2LiquidityMathLibrary {
 
         require(
             reserveA > 0 && reserveB > 0,
-            "UniswapV2ArbitrageLibrary: ZERO_PAIR_RESERVES"
+            "SojoswapArbitrageLibrary: ZERO_PAIR_RESERVES"
         );
 
         // then compute how much to swap to arb to the true price
@@ -76,7 +76,7 @@ library UniswapV2LiquidityMathLibrary {
 
         // now affect the trade to the reserves
         if (aToB) {
-            uint256 amountOut = UniswapV2Library.getAmountOut(
+            uint256 amountOut = SojoswapLibrary.getAmountOut(
                 amountIn,
                 reserveA,
                 reserveB
@@ -84,7 +84,7 @@ library UniswapV2LiquidityMathLibrary {
             reserveA += amountIn;
             reserveB -= amountOut;
         } else {
-            uint256 amountOut = UniswapV2Library.getAmountOut(
+            uint256 amountOut = SojoswapLibrary.getAmountOut(
                 amountIn,
                 reserveB,
                 reserveA
@@ -133,15 +133,15 @@ library UniswapV2LiquidityMathLibrary {
         address tokenB,
         uint256 liquidityAmount
     ) internal view returns (uint256 tokenAAmount, uint256 tokenBAmount) {
-        (uint256 reservesA, uint256 reservesB) = UniswapV2Library.getReserves(
+        (uint256 reservesA, uint256 reservesB) = SojoswapLibrary.getReserves(
             factory,
             tokenA,
             tokenB
         );
-        IUniswapV2Pair pair = IUniswapV2Pair(
-            UniswapV2Library.pairFor(factory, tokenA, tokenB)
+        ISojoswapPair pair = ISojoswapPair(
+            SojoswapLibrary.pairFor(factory, tokenA, tokenB)
         );
-        bool feeOn = IUniswapV2Factory(factory).feeTo() != address(0);
+        bool feeOn = ISojoswapFactory(factory).feeTo() != address(0);
         uint256 kLast = feeOn ? pair.kLast() : 0;
         uint256 totalSupply = pair.totalSupply();
         return
@@ -165,9 +165,9 @@ library UniswapV2LiquidityMathLibrary {
         uint256 truePriceTokenB,
         uint256 liquidityAmount
     ) internal view returns (uint256 tokenAAmount, uint256 tokenBAmount) {
-        bool feeOn = IUniswapV2Factory(factory).feeTo() != address(0);
-        IUniswapV2Pair pair = IUniswapV2Pair(
-            UniswapV2Library.pairFor(factory, tokenA, tokenB)
+        bool feeOn = ISojoswapFactory(factory).feeTo() != address(0);
+        ISojoswapPair pair = ISojoswapPair(
+            SojoswapLibrary.pairFor(factory, tokenA, tokenB)
         );
         uint256 kLast = feeOn ? pair.kLast() : 0;
         uint256 totalSupply = pair.totalSupply();

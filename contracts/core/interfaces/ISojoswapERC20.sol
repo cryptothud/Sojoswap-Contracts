@@ -1,6 +1,6 @@
 pragma solidity >=0.5.0;
 
-interface IUniswapV2ERC20 {
+interface ISojoswapERC20 {
     event Approval(
         address indexed owner,
         address indexed spender,

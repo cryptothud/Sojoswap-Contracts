@@ -1,6 +1,6 @@
 pragma solidity =0.6.6;
 
-import "../libraries/UniswapV2LiquidityMathLibrary.sol";
+import "../libraries/SojoswapLiquidityMathLibrary.sol";
 
 contract ExampleComputeLiquidityValue {
     using SafeMath for uint256;
@@ -11,7 +11,7 @@ contract ExampleComputeLiquidityValue {
         factory = factory_;
     }
 
-    // see UniswapV2LiquidityMathLibrary#getReservesAfterArbitrage
+    // see SojoswapLiquidityMathLibrary#getReservesAfterArbitrage
     function getReservesAfterArbitrage(
         address tokenA,
         address tokenB,
@@ -19,7 +19,7 @@ contract ExampleComputeLiquidityValue {
         uint256 truePriceTokenB
     ) external view returns (uint256 reserveA, uint256 reserveB) {
         return
-            UniswapV2LiquidityMathLibrary.getReservesAfterArbitrage(
+            SojoswapLiquidityMathLibrary.getReservesAfterArbitrage(
                 factory,
                 tokenA,
                 tokenB,
@@ -28,14 +28,14 @@ contract ExampleComputeLiquidityValue {
             );
     }
 
-    // see UniswapV2LiquidityMathLibrary#getLiquidityValue
+    // see SojoswapLiquidityMathLibrary#getLiquidityValue
     function getLiquidityValue(
         address tokenA,
         address tokenB,
         uint256 liquidityAmount
     ) external view returns (uint256 tokenAAmount, uint256 tokenBAmount) {
         return
-            UniswapV2LiquidityMathLibrary.getLiquidityValue(
+            SojoswapLiquidityMathLibrary.getLiquidityValue(
                 factory,
                 tokenA,
                 tokenB,
@@ -43,7 +43,7 @@ contract ExampleComputeLiquidityValue {
             );
     }
 
-    // see UniswapV2LiquidityMathLibrary#getLiquidityValueAfterArbitrageToPrice
+    // see SojoswapLiquidityMathLibrary#getLiquidityValueAfterArbitrageToPrice
     function getLiquidityValueAfterArbitrageToPrice(
         address tokenA,
         address tokenB,
@@ -52,7 +52,7 @@ contract ExampleComputeLiquidityValue {
         uint256 liquidityAmount
     ) external view returns (uint256 tokenAAmount, uint256 tokenBAmount) {
         return
-            UniswapV2LiquidityMathLibrary
+            SojoswapLiquidityMathLibrary
                 .getLiquidityValueAfterArbitrageToPrice(
                     factory,
                     tokenA,
@@ -72,7 +72,7 @@ contract ExampleComputeLiquidityValue {
         uint256 liquidityAmount
     ) external view returns (uint256) {
         uint256 gasBefore = gasleft();
-        UniswapV2LiquidityMathLibrary.getLiquidityValueAfterArbitrageToPrice(
+        SojoswapLiquidityMathLibrary.getLiquidityValueAfterArbitrageToPrice(
             factory,
             tokenA,
             tokenB,

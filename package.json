@@ -1,5 +1,5 @@
 {
-  "name": "hardhat-project",
+  "name": "sojoswap-contracts",
   "scripts": {
     "build": "hardhat generateInitCode && hardhat compile",
     "test": "hardhat test",
