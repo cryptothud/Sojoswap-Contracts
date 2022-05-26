@@ -6,8 +6,8 @@ import "./libraries/SafeMath.sol";
 contract SojoswapERC20 is ISojoswapERC20 {
     using SafeMath for uint256;
 
-    string override public constant name = "Uniswap V2";
-    string override public constant symbol = "UNI-V2";
+    string override public constant name = "Sojoswap LP";
+    string override public constant symbol = "SOJO-LP";
     uint8 override public constant decimals = 18;
     uint256 override public totalSupply;
     mapping(address => uint256) override public balanceOf;
