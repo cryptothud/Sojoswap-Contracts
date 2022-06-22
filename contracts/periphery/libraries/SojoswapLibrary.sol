@@ -38,7 +38,7 @@ library SojoswapLibrary {
                         factory,
                         keccak256(abi.encodePacked(token0, token1)),
                         //init code hash generated via generateInitCodeHash hh task for next line
-                        hex"620f97d8d402df680a69de467e1d19545a27a2a5e9672a938bf838ba7edda356"
+                        hex"94fec971f291125ba989ae14a2fa659e5a3891fdec339366a41794f58d26e267"
                     )
                 )
             )
